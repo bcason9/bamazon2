@@ -1,36 +1,37 @@
 var mysql = require("mysql");
-//var inquirer = require("inquirer");
+var inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
     host: "127.0.0.1",
     port: 3306,
     user: "root",
-    password: PASSWORD,
+    password: <password>,
     database: "bamazon"
 })
 
-function startApp() {
-    connection.connect(function(err){
-        if (err) throw err;
+
+function checkTable() {
     connection.query("SELECT * FROM products", function (err,res) {
         if(err) {
             console.log(err);
         };
 
         console.log("------------\nWelcome to Bamazon!\n------------")
-        console.log(res)
-        for (i=0; i<res.length; i++) {
-            console.log("ID: " + res[i].item_id + "\nProduct: " + res[i].product_name 
-            + "\nDepartment: " + res[i].department_name + "\nPrice: " + res[i].price + "\nQuantity: " + res[i].quantity);
-        } 
+        console.table(res)
 
-        //inquirer framework here (will complete when issues with mysql solved)
-        /*
+        startApp(err, res);
+    })
+}
+
+
+function startApp(err, res) {
+    
+        
         inquirer.prompt ([
             {
                 type: "input",
                 name: "itemId",
-                message: "What item would you like to buy? Please enter the ID of the item!"
+                message: "Welcome to Bamazon! What item would you like to buy? Please enter the ID of the item!"
             },
             {
                 type: "input",
@@ -39,30 +40,56 @@ function startApp() {
             },
             
         ]).then(function(ans){
-            var itemBought = (ans.itemId);
+            var itemBought = parseInt(ans.itemId);
             var quantityBought = parseInt(ans.quantity);
-            //get total price
-            var totalPrice 
+            var totalPrice;
+            var newQuant;
+            
 
-            console.log("Your total is $" + totalPrice)
-        })
+            for (var i=0; i<res.length; i++) {
 
-        //code to check quantity
-        //connect to db
-        //if statement--make sure item selected has high enough quantity, throw error for insufficient quantity
+                
+
+                if (itemBought === res[i].item_id) {
+                    if (quantityBought >= res[i].quantity) {
+                        console.log("Sorry! We only have " + res[i].quantity + " of that item!")
+                        
+
+                    } else {
+                        totalPrice = quantityBought * res[i].price;
+                        console.log();
+                        console.log( quantityBought + " of the " + res[i].product_name +"\nYour total is $" + totalPrice);
+                        newQuant = res[i].quantity - quantityBought;
+
+                        //function updateTable() {
+                            connection.query("UPDATE products SET ? WHERE ?",
+                            [
+                                {quantity: newQuant},
+                                {item_id: ans.itemId},
+                            ],
+                            function (err, res) {
+
+                               
+                                connection.query("SELECT * FROM products", function(err, res){
+                                    console.table(res);
+                                    //console.log(newQuant);
+                                    connection.end();
+                                })
+                            });
+
+
+                        
+                    }
+                    
+                }
+
+                
+                
+            }
         
-        //update db
-        //connect to db
-        //change quantity of item to reflect items purchased
+    
 
-        //add prompt for going buying something else
-        //if yes, run inquirer again
-        //if no, end prompt
         
-        */
-
-        })
     })
-}
-
-startApp();
+};
+checkTable();
