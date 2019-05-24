@@ -10,7 +10,7 @@ Requires npm inquirer, mySQL, and npm install of package-JSON.
 
 The below image dislpays the functionality of the app. The app is initiated, which displays a table drawn from mySQL populated with items, quantities, and prices from the database. The user is asked to select a product ID, followed by a quantity. The app then calculates a total price based on how many units of the item have been purchased, while also updating the database to reflect items which have been purchased. Finally, the database table is shown again with updated quantity counts.
 
-![](images/Screenshot%20(30).png)
+![](Screenshot%20(30).png)
 
 # Future Development
 
